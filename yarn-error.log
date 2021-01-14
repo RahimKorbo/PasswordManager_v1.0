@@ -2,7 +2,7 @@ Arguments:
   /snap/node/3524/bin/node /snap/node/3524/bin/yarn.js config get registry
 
 PATH: 
-  /home/rahim/.npm/_npx/29063/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+  /home/rahim/.npm/_npx/1035/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 
 Yarn version: 
   1.22.5
@@ -28,7 +28,7 @@ Trace:
 
 npm manifest: 
   {
-    "name": "passwordmanager",
+    "name": "testapp",
     "version": "0.1.0",
     "private": true
   }
