@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { Link, Redirect } from "react-router-dom";
 import {
     Grid,
     GridColumn as Column,
@@ -9,136 +10,145 @@ import {
 import { MyCommandCell } from "./MyCommandCell.js";
 import { insertItem, getItems, updateItem, deleteItem } from "./service.js";
 import '@progress/kendo-theme-default/dist/all.css';
-import './Login.css';
+import './table.css';
+import { TestData } from './TestData.jsx';
+import { addRecord, getRecord } from "./PasswordDataCall.js";
+
+import ReactDataGrid from 'react-data-grid';
 
 
 export default class Dashboard extends React.Component {
-    editField = "inEdit";
-    state = {
-        data: []
-    };
+
+    constructor(props) {
+        super(props);
+        console.log("props value--", props.location.state);
+        this.state = {
+            navigate: false,
+            // username: "",
+            // password: "",
+            fields: {},
+            isLoading: false,
+            errors: {},
+            rows: [],
+            userName: props.location.state.id,
+            authUser: ""
+        };
+
+    }
+
+
+    getData = () => {
+        const json = { userName: this.state.userName }
+        console.log("username in session::", json);
+
+        getRecord(json)
+            .then(res => {
+                if (res.status == 200) {
+                    console.log("Getting response from API--", res.data)
+                    this.setState({ rows: res.data })
+                }
+                else {
+                    console.log("Error")
+                }
+            })
+    }
 
     componentDidMount() {
+
         this.setState({
-            data: getItems()
+            userName: localStorage.getItem("username"),
+            authUser: sessionStorage.getItem("authUser")
+        })
+        console.log("Session Value-->" + this.state.userName)
+        console.log("Session2 Value-->" + this.state.authUser)
+        this.getData();
+    }
+
+    handleItemChanged(i, event) {
+        var items = this.state.rows;
+
+        alert("Edit Button---" + event.target.value);
+        items[i] = event.target.value;
+
+        this.setState({
+            rows: items
+        });
+    }
+    handleItemDeleted(i) {
+        var items = this.state.rows;
+
+        items.splice(i, 1);
+
+        this.setState({
+            rows: items
         });
     }
 
-    CommandCell = props => (
-        <MyCommandCell
-            {...props}
-            edit={this.enterEdit}
-            remove={this.remove}
-            add={this.add}
-            discard={this.discard}
-            update={this.update}
-            cancel={this.cancel}
-            editField={this.editField}
-        />
-    );
+    handleClick() {
+        var items = this.state.rows;
+        console.log("Data on Add Data BUtton:" + items);
 
-    // modify the data in the store, db etc
-    remove = dataItem => {
-        const data = deleteItem(dataItem);
-        this.setState({ data });
-    };
 
-    add = dataItem => {
-        dataItem.inEdit = true;
-
-        const data = insertItem(dataItem);
-        this.setState({
-            data: data
-        });
-    };
-
-    update = dataItem => {
-        dataItem.inEdit = false;
-        const data = updateItem(dataItem);
-        this.setState({ data });
-    };
-
-    // Local state operations
-    discard = dataItem => {
-        const data = [...this.state.data];
-        data.splice(0, 1)
-        this.setState({ data });
-    };
-
-    cancel = dataItem => {
-        const originalItem = getItems().find(
-            p => p.ProductID === dataItem.ProductID
-        );
-        const data = this.state.data.map(item =>
-            item.ProductID === originalItem.ProductID ? originalItem : item
-        );
-
-        this.setState({ data });
-    };
-
-    enterEdit = dataItem => {
-        this.setState({
-            data: this.state.data.map(item =>
-                item.ProductID === dataItem.ProductID ? { ...item, inEdit: true } : item
-            )
-        });
-    };
-
-    itemChange = event => {
-        const data = this.state.data.map(item =>
-            item.ProductID === event.dataItem.ProductID
-                ? { ...item, [event.field]: event.value }
-                : item
-        );
-
-        this.setState({ data });
-    };
-
-    addNew = () => {
-        const newDataItem = { inEdit: true, Discontinued: false };
-
-        this.setState({
-            data: [newDataItem, ...this.state.data]
-        });
-    };
-
+    }
     render() {
+
+
+        const { rows } = this.state.rows;
+        var context = this;
         return (
             <div className="Login">
-            <Grid
-                style={{ height: "420px" }}
-                data={this.state.data}
-                onItemChange={this.itemChange}
-                editField={this.editField}
-            >
-                <GridToolbar>
+
+                <div>
+                    <h3>Welcome, {this.state.userName}</h3>
                     <button
-                        title="Add new"
-                        className="k-button k-primary"
-                        onClick={this.addNew}
+                        role="button"
+                        className="button"
+
                     >
-                        Add new
-          </button>
-                </GridToolbar>
-                <Column field="ProductID" title="Id" width="50px" editable={false} />
-                <Column field="ProductName" title="Product Name" width="200px" />
-                <Column
-                    field="FirstOrderedOn"
-                    title="First Ordered"
-                    editor="date"
-                    format="{0:d}"
-                    width="150px"
-                />
-                <Column
-                    field="UnitsInStock"
-                    title="Units"
-                    width="120px"
-                    editor="numeric"
-                />
-                <Column field="Discontinued" title="Discontinued" editor="boolean" />
-                <Column cell={this.CommandCell} width="200px" />
-            </Grid>
+                        <Link to="/" onClick={() => { sessionStorage.clear() }} >
+                            <span> Logout</span>
+                        </Link>
+                    </button>
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <button onClick={context.handleClick.bind()}> Add Record </button>
+                            </tr>
+                            <tr>
+                                <th>Password Id</th>
+                                <th>Site name</th>
+                                <th>Site password</th>
+                                <th>Site Username</th>
+                                <th>Button</th>
+                                <th>Button</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.state.rows.map((listValue, index) => {
+                                return (
+                                    <tr key={index}>
+                                        <td>{listValue.pwdId}</td>
+                                        <td>{listValue.siteName}</td>
+                                        <td>{listValue.sitePwd}</td>
+                                        <td>{listValue.siteUserName}</td>
+                                        <td>
+                                            <button onClick={context.handleItemChanged.bind(context, index)}> Edit </button>
+                                        </td>
+                                        <td>
+                                            <button onClick={context.handleItemDeleted.bind(context, index)}> Delete </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+
+
             </div>
         );
     }
+
+
+
 }
