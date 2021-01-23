@@ -1,20 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Link, Redirect } from "react-router-dom";
-import {
-    Grid,
-    GridColumn as Column,
-    GridToolbar
-} from "@progress/kendo-react-grid";
-
-import { MyCommandCell } from "./MyCommandCell.js";
-import { insertItem, getItems, updateItem, deleteItem } from "./service.js";
-import '@progress/kendo-theme-default/dist/all.css';
-import './table.css';
-import { TestData } from './TestData.jsx';
 import { addRecord, getRecord } from "./PasswordDataCall.js";
-
-import ReactDataGrid from 'react-data-grid';
 
 
 export default class Dashboard extends React.Component {
@@ -112,7 +99,7 @@ export default class Dashboard extends React.Component {
                     <table class="styled-table">
                         <thead>
                             <tr>
-                                <button onClick={context.handleClick.bind()}> Add Record </button>
+                                <button> <Link to={{ pathname: "/newRecord", state: { id: this.state.userName } }}>Add Record</Link></button>
                             </tr>
                             <tr>
                                 <th>Password Id</th>
@@ -132,7 +119,7 @@ export default class Dashboard extends React.Component {
                                         <td>{listValue.sitePwd}</td>
                                         <td>{listValue.siteUserName}</td>
                                         <td>
-                                            <button onClick={context.handleItemChanged.bind(context, index)}> Edit </button>
+                                            <button> <Link to={{ pathname: "/editRecord", state: { item: listValue , id: this.state.userName} }}>Edit Record</Link></button>
                                         </td>
                                         <td>
                                             <button onClick={context.handleItemDeleted.bind(context, index)}> Delete </button>

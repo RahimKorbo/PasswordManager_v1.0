@@ -4,6 +4,7 @@ import Axios from "axios";
 import { loginURL } from "./Constants";
 import { Spinner } from "react-bootstrap";
 import loading from '../assets/loading.gif';
+import './Login.css'
 
 export default class Login extends Component {
   constructor(props) {
